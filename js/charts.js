@@ -14,7 +14,7 @@ function prepareCanvas(canvas) {
 function grid(context, width, height, max, formatter, left = 46, bottom = 32) {
   const top = 14;
   const plotHeight = height - top - bottom;
-  context.font = "10px system-ui, sans-serif";
+  context.font = "12px system-ui, sans-serif";
   context.textAlign = "right";
   context.textBaseline = "middle";
   for (let index = 0; index <= 4; index++) {
@@ -53,7 +53,7 @@ export function drawAlgorithmChart(canvas, samples) {
       ctx.fill();
     });
     ctx.fillStyle = "#9ca7ba";
-    ctx.font = "10px system-ui, sans-serif";
+    ctx.font = "12px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillText(sample.label, center, height - 23);
@@ -68,7 +68,7 @@ export function drawUnionChart(canvas, variants) {
   const top = 15;
   const rowHeight = (height - top - 8) / variants.length;
   const max = Math.max(0.001, ...variants.map((item) => item.milliseconds)) * 1.15;
-  ctx.font = "10px system-ui, sans-serif";
+  ctx.font = "12px system-ui, sans-serif";
   variants.forEach((item, index) => {
     const y = top + index * rowHeight;
     ctx.fillStyle = "#a9b3c5";
