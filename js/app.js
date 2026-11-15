@@ -79,7 +79,7 @@ function refreshGraphControls() {
 function updateRunControls(traceAvailable = Boolean(player?.events.length), canStep = traceAvailable) {
   const graphCanRun = graph?.vertices.length > 0;
   elements.play.disabled = !bridgeReady || !graphCanRun;
-  elements.next.disabled = !bridgeReady || !graphCanRun || (!traceAvailable && !graphCanRun) || !canStep;
+  elements.next.disabled = !bridgeReady || !graphCanRun || (traceAvailable && !canStep);
   elements.reset.disabled = !player || player.events.length === 0;
   if (!isPlaying && !player?.events.length) {
     elements.play.innerHTML = "▶ <span>Run algorithm</span>";
@@ -172,6 +172,10 @@ function startTrace() {
 }
 
 function handleRun() {
+  if (player.events.length && player.index >= player.events.length) {
+    stopPlayback();
+    if (!startTrace()) return;
+  }
   if (!player.events.length && !startTrace()) return;
   pauseOrResume();
 }

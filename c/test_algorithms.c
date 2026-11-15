@@ -19,8 +19,8 @@ int main(void) {
   require(count > 0, "Kruskal returns a trace");
   require(mst_result_total == 7 && mst_result_count == 3 &&
           mst_result_components == 1, "Kruskal returns the expected sample MST");
-  require(mst_uf_stats.find_calls == 8 && mst_uf_stats.union_calls == 4,
-          "Kruskal performs Find and Union for each examined edge");
+  require(mst_uf_stats.find_calls == 8 && mst_uf_stats.union_calls == 3,
+          "Kruskal calls Union only for accepted edges");
   count = run_prim(sample, 4, 5, 0, trace, 64);
   require(count > 0, "Prim returns a trace");
   require(mst_result_total == 7 && mst_result_count == 3 &&

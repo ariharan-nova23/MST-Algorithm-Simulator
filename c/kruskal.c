@@ -83,10 +83,14 @@ int mst_kruskal_internal(const MstEdge *edges, int vertices, int edge_count,
     status = emit_event(events, event_capacity, &event_count, MST_EVENT_KRUSKAL_FIND,
                         edge.u, edge.v, edge.weight, total, selected, root_u, root_v);
     if (status != 0) break;
-    if (!uf_union_roots(parent, rank, root_u, root_v, UF_RANK_COMPRESSION)) {
+    if (root_u == root_v) {
       status = emit_event(events, event_capacity, &event_count, MST_EVENT_KRUSKAL_REJECT,
                           edge.u, edge.v, edge.weight, total, selected, root_u, root_v);
     } else {
+      if (!uf_union_roots(parent, rank, root_u, root_v, UF_RANK_COMPRESSION)) {
+        status = -1;
+        break;
+      }
       total += edge.weight;
       ++selected;
       --components;

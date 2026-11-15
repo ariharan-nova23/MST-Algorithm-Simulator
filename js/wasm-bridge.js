@@ -27,6 +27,9 @@ export class WasmBridge {
       throw new Error("The generated C/WebAssembly engine was not found. Run `npm run build:wasm` after installing Emscripten.");
     }
     this.module = await globalThis.createMstModule();
+    if (!(this.module.HEAP32 instanceof Int32Array) || typeof this.module._malloc !== "function") {
+      throw new Error("The generated WebAssembly module is missing its exported memory view. Rebuild it with `npm run build:wasm`.");
+    }
     return true;
   }
 

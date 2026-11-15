@@ -126,10 +126,14 @@ export class TracePlayer {
       mark(event.a, event.b, "edge-accepted");
       this.insight.textContent = `${labelFor(this.vertices, event.a)} — ${labelFor(this.vertices, event.b)} is safe to add; it joins separate tree components.`;
     } else if (event.type === "kruskal-reject" || event.type === "prim-skip") {
-      mark(event.a, event.b, "edge-rejected");
-      this.insight.textContent = event.type === "prim-skip" && !event.x
-        ? "This edge did not improve the neighboring vertex’s current key."
-        : "The edge is rejected because the endpoints are already connected; adding it would create a cycle.";
+      const key = edgeKey(event.a, event.b);
+      if (event.type === "prim-skip" && highlights.get(key) === "edge-accepted") {
+        active = key;
+        this.insight.textContent = "This edge is already part of the tree; its reverse adjacency is skipped.";
+      } else {
+        mark(event.a, event.b, "edge-rejected");
+        this.insight.textContent = "The edge is rejected because both endpoints are already in the tree; it would form a cycle.";
+      }
     } else if (event.type === "prim-examine" || event.type === "prim-update") {
       active = edgeKey(event.a, event.b);
       this.insight.textContent = event.type === "prim-update"

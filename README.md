@@ -12,9 +12,11 @@ The project has no npm runtime dependencies. `npm run build:wasm` generates `was
 
 ## Build and run
 
-1. Install and activate the Emscripten SDK in your terminal (Windows PowerShell example, adjust the path to your SDK):
+1. Install and activate Emscripten (Windows PowerShell example; adjust the path to your SDK):
 
    ```powershell
+   & "C:\emsdk\emsdk.bat" install latest
+   & "C:\emsdk\emsdk.bat" activate latest
    & "C:\emsdk\emsdk_env.ps1"
    ```
 

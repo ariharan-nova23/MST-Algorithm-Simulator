@@ -49,6 +49,8 @@ def main():
         "ENVIRONMENT=web",
         "-s",
         f"EXPORTED_FUNCTIONS={json.dumps(EXPORTS)}",
+        "-s",
+        'EXPORTED_RUNTIME_METHODS=["HEAP32"]',
         "-o",
         OUTPUT,
     ]
