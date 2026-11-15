@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="An interactive, WebAssembly-powered exploration of Prim's and Kruskal's minimum spanning tree algorithms.">
+  <title>MST Visualizer — Infrastructure Network Design</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#home" aria-label="MST Visualizer home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M8 28 17 11l8 17 7-14M8 28h17" /><circle cx="8" cy="28" r="3"/><circle cx="17" cy="11" r="3"/><circle cx="25" cy="28" r="3"/><circle cx="32" cy="14" r="3"/></svg></span>
+        <span class="brand-copy"><strong>mst<span>.</span>lab</strong><small>ALGORITHM STUDIO</small></span>
+      </a>
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link active" href="#home" data-page="home"><span class="nav-icon">⌂</span>Overview</a>
+        <a class="nav-link" href="#theory" data-page="theory"><span class="nav-icon">◇</span>Theory</a>
+        <a class="nav-link" href="#simulator" data-page="simulator"><span class="nav-icon">⌘</span>Simulator <span class="nav-tag">LIVE</span></a>
+        <a class="nav-link" href="#analysis" data-page="analysis"><span class="nav-icon">▥</span>Analysis</a>
+        <a class="nav-link" href="#about" data-page="about"><span class="nav-icon">ⓘ</span>About project</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="engine-card">
+          <div class="engine-icon">C</div>
+          <div><strong>WASM engine</strong><small id="engine-status">Checking runtime…</small></div>
+          <span class="status-dot" id="engine-dot"></span>
+        </div>
+        <div class="sidebar-foot">DESIGN & ANALYSIS OF ALGORITHMS<br><span>FOUNDATION TRACK A</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="menu-toggle" aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><strong id="page-title">Overview</strong></div>
+        <div class="topbar-right"><span class="topbar-chip"><i></i> C → WebAssembly</span><span class="topbar-date">INTERACTIVE LAB</span></div>
+      </header>
+
+      <section class="page-section active" id="page-home" data-title="Overview">
+        <div class="hero-panel">
+          <div class="hero-grid"></div>
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> GRAPH THEORY · ALGORITHM LAB</div>
+            <h1>Design better<br>networks<span class="gradient-text">. One edge at a time.</span></h1>
+            <p>Explore the algorithms that connect every point at minimum cost. Build a network, watch C code find its minimum spanning tree, and measure how it performs.</p>
+            <div class="hero-actions"><button class="button button-primary" data-go="simulator">Open simulator <span>↗</span></button><button class="button button-quiet" data-go="theory">Explore the theory <span>→</span></button></div>
+            <div class="hero-meta"><span><i class="live-pulse"></i> EXECUTED IN C / WASM</span><span>PRIM · KRUSKAL · UNION-FIND</span></div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+            <svg viewBox="0 0 420 340" class="network-art">
+              <g class="art-muted"><path d="M65 70 170 46 264 90 352 54M65 70 92 174 170 46M264 90 314 186 352 54M92 174 52 275 161 292M92 174 206 205 161 292M206 205 314 186 352 276 161 292M314 186 352 276"/></g>
+              <g class="art-tree"><path d="M65 70 170 46 264 90 314 186 206 205 161 292 52 275"/></g>
+              <g class="art-weights"><text x="109" y="46">2</text><text x="214" y="54">4</text><text x="295" y="137">1</text><text x="252" y="202">3</text><text x="178" y="259">2</text><text x="57" y="224">5</text></g>
+              <g class="art-nodes"><circle cx="65" cy="70" r="8"/><circle cx="170" cy="46" r="8"/><circle cx="264" cy="90" r="8"/><circle cx="352" cy="54" r="8"/><circle cx="92" cy="174" r="8"/><circle cx="206" cy="205" r="8"/><circle cx="314" cy="186" r="8"/><circle cx="52" cy="275" r="8"/><circle cx="161" cy="292" r="8"/><circle cx="352" cy="276" r="8"/></g>
+              <g class="art-labels"><text x="47" y="59">A</text><text x="157" y="30">B</text><text x="253" y="75">C</text><text x="356" y="42">D</text><text x="76" y="165">E</text><text x="204" y="229">F</text><text x="317" y="174">G</text></g>
+            </svg>
+            <div class="art-badge"><span class="badge-check">⌁</span><span><b>ILLUSTRATIVE NETWORK</b><small>run the simulator for measured results</small></span></div>
+          </div>
+          <div class="hero-index">01 <span>/ 05</span></div>
+        </div>
+
+        <div class="section-heading home-heading"><div><div class="eyebrow">THE BIG IDEA</div><h2>One tree. Every node. Lowest cost.</h2></div><p>A minimum spanning tree connects a weighted, undirected network without loops—using the smallest possible total edge weight.</p></div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="card-topline"><span class="feature-icon purple">◈</span><span class="mini-label">01 / GROW A TREE</span></div><h3>Prim’s algorithm</h3><p>Start anywhere. Repeatedly attach the cheapest edge from the connected tree to a new vertex.</p><div class="feature-bottom"><span>Priority queue · greedy</span><button data-go="simulator" aria-label="Open Prim's simulator">↗</button></div></article>
+          <article class="feature-card"><div class="card-topline"><span class="feature-icon blue">⌘</span><span class="mini-label">02 / JOIN COMPONENTS</span></div><h3>Kruskal’s algorithm</h3><p>Sort the edges. Add them from lightest to heaviest, skipping any edge that closes a cycle.</p><div class="feature-bottom"><span>Edge sort · Union-Find</span><button data-go="simulator" aria-label="Open Kruskal's simulator">↗</button></div></article>
+          <article class="feature-card"><div class="card-topline"><span class="feature-icon green">⌁</span><span class="mini-label">03 / REAL WORLD</span></div><h3>Networks that scale</h3><p>Plan fiber routes, power grids, water pipelines, and road connections at minimum infrastructure cost.</p><div class="feature-bottom"><span>Infrastructure design</span><button data-go="about" aria-label="About this project">↗</button></div></article>
+        </div>
+        <div class="home-bottom"><div><div class="eyebrow">READY TO EXPERIMENT?</div><h2>Your graph. Your rules.</h2><p>Add nodes and weighted links, then step through both algorithms side by side.</p></div><button class="button button-primary" data-go="simulator">Build a network <span>→</span></button></div>
+      </section>
+
+      <section class="page-section" id="page-theory" data-title="Theory">
+        <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> FOUNDATIONS</div><h1>Theory, <span class="gradient-text">connected.</span></h1><p>Everything you need to understand how greedy algorithms build a minimum-cost network.</p></div>
+        <div class="theory-layout">
+          <aside class="theory-index"><strong>IN THIS CHAPTER</strong><a href="#th-graph">Graph fundamentals</a><a href="#th-mst">Spanning trees & MST</a><a href="#th-greedy">The greedy choice</a><a href="#th-kruskal">Kruskal’s algorithm</a><a href="#th-prim">Prim’s algorithm</a><a href="#th-uf">Union-Find</a><a href="#th-complexity">Complexity</a></aside>
+          <div class="theory-content">
+            <article class="theory-card" id="th-graph"><span class="chapter-number">01</span><div><h2>Graph fundamentals</h2><p>A graph <strong>G = (V, E)</strong> consists of vertices <em>V</em> and edges <em>E</em> connecting pairs of vertices. In this lab, graphs are <strong>undirected</strong> (an edge works in either direction) and <strong>weighted</strong> (each edge has a cost).</p><div class="math-block">G = (V, E, w) &nbsp;·&nbsp; w : E → ℝ</div><p>A road network is a useful model: junctions are vertices, roads are edges, and their installation cost or distance is the weight.</p></div></article>
+            <article class="theory-card" id="th-mst"><span class="chapter-number">02</span><div><h2>Spanning trees & minimum cost</h2><p>A <strong>spanning tree</strong> reaches every vertex in a connected graph without cycles. Every spanning tree on <em>V</em> vertices has exactly <em>V − 1</em> edges. A <strong>minimum spanning tree</strong> (MST) is the spanning tree whose total weight is smallest.</p><div class="math-block">w(T) = Σ<sub>e ∈ T</sub> w(e) &nbsp;→&nbsp; min</div><div class="theory-callout"><span>◎</span><p><strong>Sample graph:</strong> AB=1, BC=2, AC=3, CD=4, BD=5. The MST chooses AB, BC, CD for a total weight of <strong>7</strong>.</p></div><p>Negative edge weights are allowed. If equal weights exist, multiple different MSTs can share the same minimum total.</p></div></article>
+            <article class="theory-card" id="th-greedy"><span class="chapter-number">03</span><div><h2>The greedy choice & cut property</h2><p>A greedy algorithm commits to a locally cheapest safe choice. The <strong>cut property</strong> explains why it works: for any cut dividing vertices into two sets, a minimum-weight edge crossing that cut is safe to include in some MST.</p><div class="math-block">lightest edge crossing a cut &nbsp;∈&nbsp; some MST</div><p>Prim grows one connected component and repeatedly crosses its boundary. Kruskal grows a forest and joins separate components.</p></div></article>
+            <article class="theory-card" id="th-kruskal"><span class="chapter-number">04</span><div><h2>Kruskal: join components</h2><p>Sort edges in nondecreasing weight order. For each edge, use <strong>Find</strong> to check whether its endpoints already share a component. If not, accept it and <strong>Union</strong> the two components. Stop at <em>V − 1</em> accepted edges.</p><ol class="step-list"><li>Sort E edges by weight.</li><li>Start with each vertex in its own set.</li><li>Accept an edge only when its endpoints are in different sets.</li><li>Report a forest if the graph is disconnected.</li></ol><div class="math-block">O(E log E) &nbsp; sorting dominates</div></div></article>
+            <article class="theory-card" id="th-prim"><span class="chapter-number">05</span><div><h2>Prim: grow one component</h2><p>Choose a start vertex. Maintain each unvisited vertex’s cheapest known connection (<em>key</em>) to the tree. Repeatedly extract the minimum-key vertex from a binary min-heap and relax its adjacent edges.</p><div class="math-block">key[v] = min weight of an edge from v into the tree</div><p>With an adjacency list and binary min-heap, the implementation here runs in <strong>O((V + E) log V)</strong>. If a vertex remains unreachable, Prim continues with a new component and reports the graph as disconnected.</p></div></article>
+            <article class="theory-card" id="th-uf"><span class="chapter-number">06</span><div><h2>Union-Find (disjoint sets)</h2><p>Union-Find tracks connected components using parent forests. <strong>Find(x)</strong> locates the representative; <strong>Union(a,b)</strong> joins two sets. The simulator compares four C implementations.</p><div class="variant-grid"><div><b>Naive</b><span>Attach one root to another.</span></div><div><b>Union by rank</b><span>Attach the shallower tree below the taller.</span></div><div><b>Path compression</b><span>Flatten the path during Find.</span></div><div><b>Rank + compression</b><span>Both optimizations; amortized O(α(V)).</span></div></div><p>Rank is an upper bound on tree height. Path compression rewrites each visited parent to the root, making future finds cheaper.</p></div></article>
+            <article class="theory-card" id="th-complexity"><span class="chapter-number">07</span><div><h2>Complexity at a glance</h2><p>Theory predicts asymptotic growth; the analysis dashboard separately measures actual C/WASM execution on generated graphs. Measurements depend on your browser and hardware.</p><div class="complexity-table"><div class="table-head"><span>Algorithm</span><span>Implementation</span><span>Time</span><span>Space</span></div><div><span>Kruskal</span><span>Sort + Union-Find</span><span>O(E log E)</span><span>O(V + E)</span></div><div><span>Prim</span><span>Adjacency list + binary heap</span><span>O((V+E) log V)</span><span>O(V + E)</span></div><div><span>Union-Find</span><span>Rank + compression</span><span>O(α(V)) amortized</span><span>O(V)</span></div></div></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-simulator" data-title="Simulator">
+        <div class="page-intro simulator-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> INTERACTIVE GRAPH LAB</div><h1>Build it. <span class="gradient-text">Watch it connect.</span></h1><p>Shape a network and step through the actual C implementation compiled to WebAssembly.</p></div><div class="graph-summary"><span><i class="summary-dot"></i><b id="vertex-count">4</b> VERTICES</span><span><i class="summary-dot edge-dot"></i><b id="edge-count">5</b> EDGES</span></div></div>
+        <div class="simulator-grid">
+          <div class="sim-main">
+            <article class="panel graph-panel">
+              <div class="panel-heading"><div><span class="panel-kicker">01 / GRAPH CANVAS</span><h2>Network editor</h2></div><div class="canvas-tools"><button class="select-tool active" id="select-tool" title="Select and drag vertices">↖ <span>Select</span></button><button class="select-tool" id="connect-tool" title="Click two vertices to connect">⌁ <span>Connect</span></button></div></div>
+              <div class="graph-canvas-wrap"><svg id="graph-canvas" viewBox="0 0 760 430" role="img" aria-label="Interactive weighted graph editor"></svg><div class="canvas-hint" id="canvas-hint">Drag vertices to arrange · Select an edge to edit it</div></div>
+              <div class="canvas-legend"><span><i class="legend-dot node-legend"></i> Vertex</span><span><i class="legend-line"></i> Available edge</span><span><i class="legend-line mst-legend"></i> MST edge</span><span><i class="legend-line reject-legend"></i> Rejected / cycle</span><span class="legend-spacer"></span><span id="algorithm-state">Ready to run</span></div>
+            </article>
+            <article class="panel controls-panel">
+              <div class="panel-heading compact-heading"><div><span class="panel-kicker">02 / EDIT YOUR NETWORK</span><h2>Graph controls</h2></div><button class="text-button" id="clear-graph">Clear graph <span>×</span></button></div>
+              <div class="control-grid">
+                <div class="control-block"><label>VERTICES</label><div class="inline-controls"><button class="button button-small button-outline" id="add-vertex">＋ Add vertex</button><select id="delete-vertex-select" aria-label="Vertex to delete"></select><button class="square-button" id="delete-vertex" title="Delete selected vertex">−</button></div></div>
+                <div class="control-block"><label>EDGES</label><div class="inline-controls"><select id="edge-from" aria-label="Edge start vertex"></select><span class="control-arrow">→</span><select id="edge-to" aria-label="Edge end vertex"></select><input id="edge-weight" type="number" min="-9999" max="9999" value="1" aria-label="Edge weight"><button class="button button-small button-outline" id="add-edge">＋ Add</button></div></div>
+                <div class="control-block"><label>SELECTED EDGE <span id="selected-edge-label">NONE</span></label><div class="inline-controls"><input id="edit-edge-weight" type="number" min="-9999" max="9999" placeholder="New weight" aria-label="New selected edge weight"><button class="button button-small button-outline" id="update-edge">Update weight</button><button class="square-button danger-button" id="delete-edge" title="Remove selected edge">×</button></div></div>
+                <div class="control-block"><label>PRESET NETWORK</label><div class="inline-controls"><select id="sample-select" aria-label="Sample graph"><option value="sample">Four-node sample</option><option value="city">City infrastructure</option><option value="islands">Disconnected islands</option></select><button class="button button-small button-outline" id="load-sample">Load graph</button><button class="button button-small button-outline" id="random-graph">⟳ Random</button></div></div>
+              </div>
+            </article>
+            <article class="panel run-panel">
+              <div class="run-config"><div><span class="panel-kicker">03 / CHOOSE ALGORITHM</span><div class="algorithm-switch" role="group" aria-label="Choose algorithm"><button class="algorithm-option active" data-algorithm="kruskal">Kruskal <small>edge-first</small></button><button class="algorithm-option" data-algorithm="prim">Prim <small>vertex-first</small></button></div></div><div class="start-selector" id="start-selector"><label for="prim-start">START VERTEX</label><select id="prim-start"></select></div></div>
+              <div class="run-actions"><div class="playback-buttons"><button class="button button-primary" id="play-button" disabled>▶ <span>Run algorithm</span></button><button class="button button-outline" id="next-step" disabled>Next step <b>→</b></button><button class="square-button" id="reset-algorithm" title="Reset algorithm">↺</button></div><div class="speed-control"><label for="speed-range">STEP SPEED</label><input id="speed-range" type="range" min="250" max="1400" value="750"><span id="speed-label">1×</span></div></div>
+            </article>
+          </div>
+          <aside class="sim-side">
+            <article class="panel result-panel"><div class="panel-heading compact-heading"><div><span class="panel-kicker">LIVE RESULT</span><h2>Minimum spanning tree</h2></div><span class="result-mark">↗</span></div><div class="result-weight"><span id="mst-weight">—</span><small>TOTAL WEIGHT</small></div><div class="result-stats"><div><span>SELECTED EDGES</span><b id="mst-edge-count">0 <small>/ 3</small></b></div><div><span>COMPONENTS</span><b id="component-count">4</b></div></div><div class="result-message" id="result-message">Run an algorithm to construct the minimum spanning forest.</div></article>
+            <article class="panel step-panel"><div class="panel-heading compact-heading"><div><span class="panel-kicker">EXECUTION TRACE</span><h2>Step-by-step</h2></div><span class="step-counter" id="step-counter">0 / 0</span></div><div class="trace-list" id="trace-list"><div class="trace-empty"><span>⌁</span><p>Your algorithm trace will appear here.</p><small>Select an algorithm and press Run.</small></div></div></article>
+            <article class="panel insight-panel"><div class="insight-icon">✳</div><div><span class="panel-kicker">WHY THIS EDGE?</span><p id="edge-insight">Each green edge is accepted into the growing minimum spanning forest. Red edges would create a cycle.</p></div></article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page-section" id="page-analysis" data-title="Analysis">
+        <div class="page-intro analysis-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> PERFORMANCE LAB</div><h1>Measure, <span class="gradient-text">don’t guess.</span></h1><p>Benchmarks run the actual C algorithms inside WebAssembly. Timings are measured in this browser—not estimated.</p></div><button class="button button-primary" id="run-benchmarks">▶ Run benchmarks</button></div>
+        <div class="measurement-note"><span>◷</span><p><strong>Measured, not fabricated.</strong> Timings are wall-clock readings around repeated WASM executions on synthetic graphs, normalized per run. Results vary with your device, browser, and graph size.</p><span class="measurement-badge" id="benchmark-status">NOT RUN</span></div>
+        <div class="analysis-cards"><article class="panel metric-card"><div class="metric-heading"><span>GRAPH SAMPLES</span><span class="metric-icon blue">⌘</span></div><b id="bench-graphs">—</b><small>synthetic connected networks</small></article><article class="panel metric-card"><div class="metric-heading"><span>MEASUREMENT ENGINE</span><span class="metric-icon purple">C</span></div><b>WebAssembly</b><small>algorithms execute in compiled C</small></article><article class="panel metric-card"><div class="metric-heading"><span>LAST BENCHMARK</span><span class="metric-icon green">◷</span></div><b id="bench-timestamp">—</b><small>local browser time</small></article></div>
+        <div class="analysis-grid"><article class="panel chart-panel"><div class="panel-heading"><div><span class="panel-kicker">ALGORITHM COMPARISON</span><h2>Execution time by graph density</h2></div><span class="chart-units">MILLISECONDS / RUN</span></div><div class="chart-wrap"><canvas id="algorithm-chart" aria-label="Measured execution time by graph density"></canvas></div><div class="chart-legend"><span><i class="chart-dot kruskal-dot"></i>Kruskal</span><span><i class="chart-dot prim-dot"></i>Prim</span></div><p class="chart-footnote">Each bar is measured by timing repeated calls into the C/WASM implementation. This is not theoretical complexity.</p></article><article class="panel chart-panel"><div class="panel-heading"><div><span class="panel-kicker">UNION-FIND VARIANTS</span><h2>Optimization trade-offs</h2></div><span class="chart-units">MEASURED</span></div><div class="chart-wrap compact-chart"><canvas id="union-chart" aria-label="Measured Union-Find variant comparison"></canvas></div><div class="chart-legend"><span><i class="chart-dot uf-dot"></i>Milliseconds / repeated workload</span></div><div class="uf-detail-grid" id="uf-details"><span>Run the benchmark to compare measured timings, Find calls, and tree depth.</span></div></article></div>
+        <div class="panel density-panel"><div class="panel-heading"><div><span class="panel-kicker">GRAPH DENSITY</span><h2>Same vertices. Different edge counts.</h2></div><span class="chart-units">THEORY VS. MEASUREMENT</span></div><div class="density-grid"><div><span class="density-icon">·</span><b>Sparse</b><small>Few edges relative to vertices. Sorting is light; heap-based Prim scans fewer neighbors.</small><span class="density-formula">E close to V</span></div><div><span class="density-icon">∷</span><b>Dense</b><small>Many possible links. Kruskal sorts a larger edge list; adjacency-list Prim examines more edges.</small><span class="density-formula">E close to V²</span></div><div class="density-caveat"><strong>Interpret carefully</strong><p>Asymptotic bounds describe growth for large inputs. Browser timings include runtime overhead and measurement noise. The chart reports observed values only.</p></div></div></div>
+        <div class="panel analysis-table-panel"><div class="panel-heading"><div><span class="panel-kicker">MEASURED RESULTS</span><h2>Benchmark data</h2></div></div><div class="table-scroll"><table class="results-table"><thead><tr><th>Density</th><th>Vertices</th><th>Edges</th><th>Kruskal / run</th><th>Prim / run</th><th>MST total (K / P)</th></tr></thead><tbody id="benchmark-rows"><tr><td colspan="6" class="empty-row">Run benchmarks to populate this table with measured results.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page-section" id="page-about" data-title="About project">
+        <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> THE PROJECT</div><h1>Infrastructure, <span class="gradient-text">optimized.</span></h1><p>Making the algorithms behind efficient connected networks visible, tangible, and measurable.</p></div>
+        <div class="about-hero panel"><div class="about-orb">MST</div><div class="about-copy"><span class="panel-kicker">PROJECT BRIEF</span><h2>Infrastructure Network Design Using Minimum Spanning Tree Algorithms</h2><p>An interactive educational application for exploring Prim’s and Kruskal’s greedy algorithms. Every algorithm, disjoint-set operation, and benchmark runs in C compiled to WebAssembly; JavaScript handles graph editing and visualization.</p><div class="about-tags"><span>DESIGN & ANALYSIS OF ALGORITHMS</span><span>FOUNDATION TRACK A</span><span>C · WEBASSEMBLY</span></div></div></div>
+        <div class="about-columns"><article class="panel about-info"><span class="panel-kicker">LEARNING OBJECTIVES</span><h3>From theory to execution</h3><ul><li>Visualize MST construction, one operation at a time.</li><li>Compare edge-first and vertex-first greedy strategies.</li><li>Observe cycle detection and Union-Find optimizations.</li><li>Measure real execution time, separate from theoretical bounds.</li></ul></article><article class="panel about-info"><span class="panel-kicker">PROJECT DETAILS</span><h3>Built with clarity</h3><div class="project-facts"><span>Course<b>Design and Analysis of Algorithms</b></span><span>Track<b>Foundation Track A</b></span><span>Core algorithms<b>C compiled to WebAssembly</b></span><span>Interface<b>HTML · CSS · Vanilla JavaScript</b></span></div></article></div>
+        <div class="contributors-section"><div class="section-heading"><div><div class="eyebrow">THE PEOPLE</div><h2>Project contributors</h2></div><span class="contributors-note">FOUNDATION TRACK A</span></div><div class="contributor-grid"><div class="contributor-card"><span class="contributor-avatar av-purple">M</span><div><b>Manu</b><small>PROJECT CONTRIBUTOR</small></div></div><div class="contributor-card"><span class="contributor-avatar av-blue">R</span><div><b>Rishika M</b><small>PROJECT CONTRIBUTOR</small></div></div><div class="contributor-card"><span class="contributor-avatar av-green">A</span><div><b>Ariharan C</b><small>PROJECT CONTRIBUTOR</small></div></div><div class="contributor-card"><span class="contributor-avatar av-orange">N</span><div><b>Nishithu S</b><small>PROJECT CONTRIBUTOR</small></div></div></div></div>
+      </section>
+      <footer class="app-footer"><span>mst.lab <i>·</i> Infrastructure network design</span><span>ALGORITHMS EXECUTE IN C / WEBASSEMBLY</span></footer>
+    </main>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <script src="wasm/mst.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

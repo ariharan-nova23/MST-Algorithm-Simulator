@@ -1,0 +1,11 @@
+{
+  "name": "mst-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive minimum spanning tree visualizer powered by C and WebAssembly",
+  "scripts": {
+    "build:wasm": "python tools/build_wasm.py",
+    "test:c": "python tools/test_c.py",
+    "serve": "python -m http.server 8000"
+  }
+}
