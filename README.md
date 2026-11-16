@@ -1,6 +1,6 @@
 # MST Visualizer
 
-A dark, interactive minimum-spanning-tree lab for infrastructure network design. Edit weighted graphs, step through Kruskal's and Prim's algorithms, inspect four Union-Find variants, and compare measured browser-local execution times.
+A clean, light-themed, interactive minimum-spanning-tree simulator. Edit weighted graphs and step through Prim's and Kruskal's algorithms, powered by C compiled to WebAssembly.
 
 ## Requirements
 
@@ -41,10 +41,6 @@ If the WASM build has not been generated, the interface reports that the C engin
 ## Using the application
 
 - **Simulator:** load the four-vertex sample, add/delete vertices and edges, edit selected edge weights, drag nodes, or generate a connected random graph. Select an algorithm, then play, pause, step, or reset. Prim's start vertex can be changed before running. Disconnected inputs are reported as minimum spanning forests.
-- **Analysis:** run the benchmarks to time repeated executions of each C algorithm on deterministic sparse, medium, and dense connected networks. The chart, result table, and MST weights are populated from those executions. Union-Find timings and operation counts come from four C variants.
-- **Theory / About:** browse the algorithm explanations and project/contributor details.
-
-Timings use `performance.now()` around repeated WebAssembly calls, normalized per execution, and depend on the local device and browser. They are empirical measurements, not theoretical complexity estimates.
 
 ## Run the C algorithm tests
 
@@ -61,5 +57,5 @@ The test harness checks the specified sample MST in both algorithms, disconnecte
 - Kruskal sorts weighted edges in C and calls the selected C Union-Find variant.
 - Prim uses C adjacency lists and a binary min-heap.
 - Naive, union-by-rank, path-compression, and combined Union-Find implementations are in C.
-- JavaScript is limited to graph editing, SVG rendering, step playback, WebAssembly memory marshaling, and timing/reporting of actual C calls.
+- JavaScript handles graph editing, SVG rendering, step playback, and WebAssembly memory marshaling.
 - The predefined A-B=1, B-C=2, A-C=3, C-D=4, B-D=5 graph has MST A-B, B-C, C-D and total weight 7.

@@ -1,7 +1,6 @@
-import { GraphEditor, createRandomGraph, edgeKey, sampleGraph } from "./graph.js";
+import { GraphEditor, createRandomGraph, sampleGraph } from "./graph.js";
 import { WasmBridge } from "./wasm-bridge.js";
 import { TracePlayer } from "./visualization.js";
-import { drawAlgorithmChart, drawUnionChart } from "./charts.js";
 
 const byId = (id) => document.getElementById(id);
 const bridge = new WasmBridge();
@@ -9,7 +8,6 @@ let bridgeReady = false;
 let currentAlgorithm = "kruskal";
 let isPlaying = false;
 let playbackTimer = null;
-let lastBenchmarks = null;
 let graph;
 let player;
 
@@ -253,174 +251,10 @@ byId("speed-range").addEventListener("input", (event) => {
   }
 });
 
-function navigateTo(page) {
-  const target = document.getElementById(`page-${page}`);
-  if (!target) return;
-  document.querySelectorAll(".page-section").forEach((section) => section.classList.toggle("active", section === target));
-  document.querySelectorAll(".nav-link").forEach((link) => link.classList.toggle("active", link.dataset.page === page));
-  byId("page-title").textContent = target.dataset.title;
-  byId("sidebar").classList.remove("sidebar-open");
-  if (page === "analysis" && lastBenchmarks) drawSavedBenchmarks();
-}
-
-document.querySelectorAll(".nav-link").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    const page = link.dataset.page;
-    history.replaceState(null, "", `#${page}`);
-    navigateTo(page);
-  });
-});
-document.querySelectorAll("[data-go]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const page = button.dataset.go;
-    history.replaceState(null, "", `#${page}`);
-    navigateTo(page);
-  });
-});
-window.addEventListener("hashchange", () => navigateTo(location.hash.slice(1) || "home"));
-byId("menu-toggle").addEventListener("click", () => byId("sidebar").classList.toggle("sidebar-open"));
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && graph.tool === "connect") {
     graph.setTool("select");
     byId("select-tool").click();
-  }
-});
-
-function generateBenchmarkGraph(size, density, seed) {
-  let state = seed >>> 0;
-  const random = () => {
-    state = (1664525 * state + 1013904223) >>> 0;
-    return state / 0x100000000;
-  };
-  const edges = [];
-  const seen = new Set();
-  const add = (u, v) => {
-    const key = edgeKey(u, v);
-    if (seen.has(key)) return;
-    seen.add(key);
-    edges.push({ u, v, weight: 1 + Math.floor(random() * 100) });
-  };
-  for (let vertex = 1; vertex < size; vertex++) add(vertex, vertex - 1);
-  const possible = (size * (size - 1)) / 2;
-  const target = Math.max(size - 1, Math.floor(possible * density));
-  for (let attempt = 0; edges.length < target && attempt < possible * 3; attempt++) {
-    const u = Math.floor(random() * size);
-    const v = Math.floor(random() * size);
-    if (u !== v) add(u, v);
-  }
-  return edges;
-}
-
-function makeUnionWorkload(size) {
-  const edges = [];
-  for (let vertex = 0; vertex < size - 1; vertex++) {
-    edges.push({ u: vertex + 1, v: vertex, weight: 1 });
-  }
-  for (let index = 0; index < Math.floor(size / 2); index++) {
-    edges.push({ u: 0, v: size - 1, weight: 1 });
-  }
-  return edges;
-}
-
-function drawSavedBenchmarks() {
-  if (!lastBenchmarks) return;
-  drawAlgorithmChart(byId("algorithm-chart"), lastBenchmarks.samples);
-  drawUnionChart(byId("union-chart"), lastBenchmarks.variants);
-}
-
-function setBenchmarkStatus(label, isError = false) {
-  const status = byId("benchmark-status");
-  status.textContent = label;
-  status.classList.toggle("status-error", isError);
-  status.classList.toggle("status-ready", !isError && label === "MEASURED");
-}
-
-async function runBenchmarks() {
-  if (!bridgeReady) {
-    showToast("Build the C/WebAssembly engine before measuring algorithms.", "error");
-    return;
-  }
-  const button = byId("run-benchmarks");
-  button.disabled = true;
-  button.textContent = "◷ Measuring…";
-  setBenchmarkStatus("MEASURING");
-  try {
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-    const configurations = [
-      { label: "Sparse", density: 0.14, seed: 241 },
-      { label: "Medium", density: 0.43, seed: 913 },
-      { label: "Dense", density: 0.82, seed: 1729 }
-    ];
-    const samples = [];
-    for (const configuration of configurations) {
-      const vertices = 28;
-      const edges = generateBenchmarkGraph(vertices, configuration.density, configuration.seed);
-      const kruskal = calibratedBenchmark((repeats) =>
-        bridge.benchmark("kruskal", vertices, edges, 0, repeats));
-      const prim = calibratedBenchmark((repeats) =>
-        bridge.benchmark("prim", vertices, edges, 0, repeats));
-      if (kruskal.total !== prim.total || kruskal.count !== prim.count ||
-          kruskal.count !== vertices - 1 || kruskal.components !== 1 || prim.components !== 1) {
-        throw new Error(`The C algorithms disagreed on the ${configuration.label.toLowerCase()} benchmark graph.`);
-      }
-      samples.push({
-        ...configuration,
-        vertices,
-        edgeCount: edges.length,
-        kruskalMs: kruskal.milliseconds,
-        primMs: prim.milliseconds,
-        kruskalTotal: kruskal.total,
-        primTotal: prim.total
-      });
-    }
-
-    const ufWorkload = makeUnionWorkload(96);
-    const variants = [
-      { name: "Naive", shortName: "Naive", id: 0 },
-      { name: "Union by rank", shortName: "By rank", id: 1 },
-      { name: "Path compression", shortName: "Compression", id: 2 },
-      { name: "Rank + compression", shortName: "Rank + compress", id: 3 }
-    ].map((variant) => ({
-      ...variant,
-      ...calibratedBenchmark((repeats) =>
-        bridge.benchmarkUnionFind(96, ufWorkload, variant.id, repeats))
-    }));
-
-    lastBenchmarks = { samples, variants };
-    byId("bench-graphs").textContent = String(samples.length);
-    byId("bench-timestamp").textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    byId("benchmark-rows").innerHTML = samples.map((sample) =>
-      `<tr><td><span class="density-pill ${sample.label.toLowerCase()}">${sample.label}</span></td><td>${sample.vertices}</td><td>${sample.edgeCount}</td><td>${sample.kruskalMs.toFixed(4)} ms</td><td>${sample.primMs.toFixed(4)} ms</td><td>${sample.kruskalTotal} / ${sample.primTotal}</td></tr>`
-    ).join("");
-    byId("uf-details").innerHTML = variants.map((variant) =>
-      `<div class="uf-detail"><b>${variant.name}</b><span>${variant.findCalls.toLocaleString()} Find calls · ${variant.parentHops.toLocaleString()} parent hops</span><small>${variant.unionCalls.toLocaleString()} Union calls · max depth ${variant.maxDepth}</small></div>`
-    ).join("");
-    drawSavedBenchmarks();
-    setBenchmarkStatus("MEASURED");
-  } catch (error) {
-    setBenchmarkStatus("FAILED", true);
-    showToast(error.message, "error");
-  } finally {
-    button.disabled = false;
-    button.innerHTML = "▶ Run benchmarks";
-  }
-}
-
-function calibratedBenchmark(run) {
-  let result = run(160);
-  const elapsed = result.milliseconds * 160;
-  if (elapsed < 20) {
-    const repeats = Math.max(160, Math.min(10000, Math.ceil(20 * 160 / Math.max(elapsed, 0.01))));
-    result = run(repeats);
-  }
-  return result;
-}
-
-byId("run-benchmarks").addEventListener("click", runBenchmarks);
-window.addEventListener("resize", () => {
-  if (lastBenchmarks && document.getElementById("page-analysis").classList.contains("active")) {
-    drawSavedBenchmarks();
   }
 });
 
@@ -447,6 +281,4 @@ async function initializeEngine() {
 refreshGraphControls();
 player.reset();
 updateRunControls(false, false);
-const initialPage = location.hash.slice(1);
-if (initialPage) navigateTo(initialPage);
 initializeEngine();
